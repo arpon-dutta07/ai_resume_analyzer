@@ -9,6 +9,10 @@ const Navbar = () => {
         Resumind
       </p>
       </Link>
+
+      <Link to="/Uplaod" className="primary-button w-fit">
+      Upload Resume
+      </Link>
     </nav>
   )
 }
