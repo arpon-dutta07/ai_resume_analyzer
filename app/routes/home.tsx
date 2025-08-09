@@ -1,6 +1,7 @@
 import Navbar from "~/components/Navbar";
 import type { Route } from "./+types/home";
-
+import ResumeCard from "~/components/ResumeCard";
+import { resumes } from "constants";// Assuming you have a data file or API to fetch resumes
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -19,5 +20,14 @@ export default function Home() {
         <h2>Get a personalized resume rating and track the status of all your applications in one place.</h2>
       </div>
     </section>
+
+{resumes.length > 0 && (
+  <div className="resumes-section">
+    {resumes.map((resume) => (
+      <ResumeCard key={resume.id} resume={resume} />
+    ))}
+  </div>
+)}
+
   </main>
 }
