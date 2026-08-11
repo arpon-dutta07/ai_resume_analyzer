@@ -109,20 +109,20 @@ const Resume = () => {
                     <span className="text-gray-800 text-sm font-semibold">Back to Homepage</span>
                 </Link>
             </nav>
-            <div className="flex flex-row w-full min-h-[calc(100vh-65px)] max-lg:flex-col-reverse">
-                <section className="w-1/2 max-lg:w-full bg-[url('/images/bg-small.svg')] bg-cover sticky top-0 h-[calc(100vh-65px)] p-2 md:p-4 flex items-center justify-center">
-                    <div className="gradient-border w-full h-full flex items-center justify-center overflow-hidden rounded-2xl bg-white/60 backdrop-blur-sm shadow-xl !p-2">
+            <div className="flex flex-row w-full items-start max-lg:flex-col-reverse">
+                <section className="w-1/2 max-lg:w-full bg-[url('/images/bg-small.svg')] bg-cover p-4 md:p-6 min-h-screen">
+                    <div className="gradient-border w-full rounded-2xl bg-white/60 backdrop-blur-sm shadow-xl !p-3">
                         {imageUrl ? (
-                            <a href={resumeUrl || imageUrl} target="_blank" rel="noopener noreferrer" className="w-full h-full flex items-center justify-center overflow-auto">
+                            <a href={resumeUrl || imageUrl} target="_blank" rel="noopener noreferrer" className="w-full block">
                                 <img
                                     src={imageUrl}
-                                    className="w-full h-full object-contain object-top rounded-xl shadow-md hover:scale-[1.005] transition-transform duration-300"
+                                    className="w-full h-auto rounded-xl shadow-md"
                                     alt="Resume Preview"
-                                    title="Click to view full resume"
+                                    title="Click to view full resume in new tab"
                                 />
                             </a>
                         ) : (
-                            <div className="flex flex-col items-center justify-center text-gray-400 gap-3 p-6">
+                            <div className="flex flex-col items-center justify-center text-gray-400 gap-3 p-12 min-h-[500px]">
                                 <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                                 <span className="text-base font-medium text-gray-600">Loading resume preview...</span>
                             </div>
