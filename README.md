@@ -1,3 +1,7 @@
+<img width="1903" height="912" alt="image" src="https://github.com/user-attachments/assets/98447bbd-912f-4082-993e-0efdfe1e5b42" />
+<img width="1900" height="900" alt="image" src="https://github.com/user-attachments/assets/3be08fbc-c471-4a94-ac7b-7896717c6573" />
+<img width="1902" height="906" alt="image" src="https://github.com/user-attachments/assets/bcd521fe-2308-4a19-b746-04621c1e63a4" />
+
 # 📄 Resumind — AI-Powered Resume & ATS Analyzer
 
 <div align="center">
