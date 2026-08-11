@@ -5,6 +5,7 @@ import { useTheme } from "~/lib/theme";
 import Summary from "~/components/Summary";
 import ATS from "~/components/ATS";
 import Details from "~/components/Details";
+import ThemeToggle from "~/components/ThemeToggle";
 
 export const meta = () => ([
     { title: 'Resumind — Detailed ATS Resume Evaluation' },
@@ -13,7 +14,6 @@ export const meta = () => ([
 
 const Resume = () => {
     const { auth, isLoading, fs, kv } = usePuterStore();
-    const { resolvedTheme, toggleTheme } = useTheme();
     const { id } = useParams();
     const [imageUrl, setImageUrl] = useState('');
     const [resumeUrl, setResumeUrl] = useState('');
@@ -135,13 +135,7 @@ const Resume = () => {
 
                 <div className="flex items-center gap-3">
                     {/* Theme Toggle */}
-                    <button
-                        onClick={toggleTheme}
-                        className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors border border-slate-200/80 dark:border-slate-700/80"
-                        title="Toggle Dark/Light Mode"
-                    >
-                        {resolvedTheme === 'dark' ? '☀️' : '🌙'}
-                    </button>
+                    <ThemeToggle />
 
                     {/* Export / Print PDF */}
                     <button

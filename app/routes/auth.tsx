@@ -1,5 +1,5 @@
 import { usePuterStore } from "~/lib/puter";
-import { useTheme } from "~/lib/theme";
+import ThemeToggle from "~/components/ThemeToggle";
 import { useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router";
 
@@ -10,7 +10,6 @@ export const meta = () => ([
 
 const Auth = () => {
     const { isLoading, auth } = usePuterStore();
-    const { resolvedTheme, toggleTheme } = useTheme();
     const location = useLocation();
     const next = location.search.split('next=')[1] || '/';
     const navigate = useNavigate();
@@ -30,13 +29,7 @@ const Auth = () => {
                 <Link to="/" className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400">
                     ← Back to App
                 </Link>
-                <button
-                    onClick={toggleTheme}
-                    className="p-2.5 rounded-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 shadow-sm"
-                    title="Toggle Theme"
-                >
-                    {resolvedTheme === 'dark' ? '☀️' : '🌙'}
-                </button>
+                <ThemeToggle />
             </div>
 
             {/* Main Auth Card */}

@@ -2,6 +2,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Mona Sans", ui-sans-serif, system-ui, sans-serif;
   --color-dark-200: #475467;
@@ -107,7 +109,7 @@ form {
 }
 
 .resume-card {
-  @apply flex flex-col gap-6 h-[540px] w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800/80 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 group relative overflow-hidden;
+  @apply flex flex-col gap-6 h-[540px] w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800/80 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 relative overflow-hidden;
 }
 
 .resume-card-header {
