@@ -41,7 +41,8 @@ async function loadPdfJsFromCDN(): Promise<any> {
                 resolve(window.pdfjsLib);
             } else {
                 // Try to import it as a module
-                import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs')
+                // @ts-ignore
+                import(/* @vite-ignore */ 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs')
                     .then((lib) => {
                         lib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs';
                         window.pdfjsLib = lib;
@@ -69,19 +70,20 @@ async function loadPdfJsLocal(): Promise<any> {
     try {
         console.log('Attempting to load PDF.js locally...');
         
-        // Try different import methods
+        // Try standard import first
         let lib;
         try {
             lib = await import("pdfjs-dist");
             console.log('PDF.js imported with standard import');
         } catch (e) {
             console.log('Standard import failed, trying build path...');
+            // @ts-ignore
             lib = await import("pdfjs-dist/build/pdf.mjs");
             console.log('PDF.js imported with build path');
         }
         
         // Set the worker source
-        if (lib.GlobalWorkerOptions) {
+        if (lib && lib.GlobalWorkerOptions) {
             lib.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
             console.log('Worker source set to local file');
         }
@@ -97,13 +99,15 @@ async function loadPdfJs(): Promise<any> {
     try {
         // Try local first
         return await loadPdfJsLocal();
-    } catch (localError) {
+    } catch (localError: any) {
         console.warn('Local PDF.js failed, trying CDN...', localError);
         try {
             return await loadPdfJsFromCDN();
-        } catch (cdnError) {
+        } catch (cdnError: any) {
             console.error('Both local and CDN PDF.js loading failed');
-            throw new Error(`PDF.js loading failed: Local: ${localError.message}, CDN: ${cdnError.message}`);
+            const locMsg = localError?.message || String(localError);
+            const cdnMsg = cdnError?.message || String(cdnError);
+            throw new Error(`PDF.js loading failed: Local: ${locMsg}, CDN: ${cdnMsg}`);
         }
     }
 }

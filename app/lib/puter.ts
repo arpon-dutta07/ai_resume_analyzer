@@ -334,24 +334,57 @@ export const usePuterStore = create<PuterStore>((set, get) => {
             return;
         }
 
-        return puter.ai.chat(
-            [
-                {
-                    role: "user",
-                    content: [
-                        {
-                            type: "file",
-                            puter_path: path,
-                        },
-                        {
-                            type: "text",
-                            text: message,
-                        },
-                    ],
-                },
-            ],
-            { model: "claude-3-7-sonnet" }
-        ) as Promise<AIResponse | undefined>;
+        const payload: ChatMessage[] = [
+            {
+                role: "user",
+                content: [
+                    {
+                        type: "file",
+                        puter_path: path,
+                    },
+                    {
+                        type: "text",
+                        text: message,
+                    },
+                ],
+            },
+        ];
+
+        // Models supported by Puter AI API in order of preference
+        const modelsToTry = [
+            "claude-3-5-sonnet",
+            "gpt-4o",
+            "claude-3.5-sonnet",
+            "gpt-4o-mini",
+            "claude-3-haiku",
+        ];
+
+        let lastError: any = null;
+
+        for (const model of modelsToTry) {
+            try {
+                console.log(`[Puter AI] Trying model: ${model}`);
+                const response = await puter.ai.chat(payload, { model });
+                if (response) {
+                    console.log(`[Puter AI] Successfully generated feedback with model: ${model}`);
+                    return response as AIResponse;
+                }
+            } catch (err: any) {
+                console.warn(`[Puter AI] Model "${model}" failed or not available:`, err?.message || err);
+                lastError = err;
+            }
+        }
+
+        // Final fallback: call puter.ai.chat without specifying a model name
+        try {
+            console.log(`[Puter AI] Trying default model fallback...`);
+            const defaultResponse = await puter.ai.chat(payload);
+            if (defaultResponse) return defaultResponse as AIResponse;
+        } catch (err: any) {
+            lastError = err;
+        }
+
+        throw lastError || new Error("All AI model attempts failed. Please try again.");
     };
 
     const img2txt = async (image: string | File | Blob, testMode?: boolean) => {

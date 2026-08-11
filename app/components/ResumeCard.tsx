@@ -8,15 +8,42 @@ const ResumeCard = ({ resume: { id, companyName, jobTitle, feedback, imagePath }
     const [resumeUrl, setResumeUrl] = useState('');
 
     useEffect(() => {
+        let isMounted = true;
+        let objectUrl = '';
+
         const loadResume = async () => {
-            const blob = await fs.read(imagePath);
-            if(!blob) return;
-            let url = URL.createObjectURL(blob);
-            setResumeUrl(url);
-        }
+            if (!imagePath) return;
+
+            // Direct URL / local static asset path
+            if (imagePath.startsWith('/images/') || imagePath.startsWith('http://') || imagePath.startsWith('https://') || imagePath.startsWith('data:')) {
+                if (isMounted) setResumeUrl(imagePath);
+                return;
+            }
+
+            // Puter FS path
+            try {
+                const blob = await fs.read(imagePath);
+                if (blob && isMounted) {
+                    objectUrl = URL.createObjectURL(blob);
+                    setResumeUrl(objectUrl);
+                } else if (isMounted) {
+                    setResumeUrl(imagePath);
+                }
+            } catch (err) {
+                console.error("Failed to load resume thumbnail:", err);
+                if (isMounted) setResumeUrl(imagePath);
+            }
+        };
 
         loadResume();
+
+        return () => {
+            isMounted = false;
+            if (objectUrl) URL.revokeObjectURL(objectUrl);
+        };
     }, [imagePath]);
+
+    const overallScore = feedback?.overallScore ?? 0;
 
     return (
         <Link to={`/resume/${id}`} className="resume-card animate-in fade-in duration-1000">
@@ -27,21 +54,25 @@ const ResumeCard = ({ resume: { id, companyName, jobTitle, feedback, imagePath }
                     {!companyName && !jobTitle && <h2 className="!text-black font-bold">Resume</h2>}
                 </div>
                 <div className="flex-shrink-0">
-                    <ScoreCircle score={feedback.overallScore} />
+                    <ScoreCircle score={overallScore} />
                 </div>
             </div>
-            {resumeUrl && (
-                <div className="gradient-border animate-in fade-in duration-1000">
-                    <div className="w-full h-full">
+            <div className="gradient-border animate-in fade-in duration-1000">
+                <div className="w-full h-full min-h-[250px] flex items-center justify-center bg-gray-50 rounded-2xl overflow-hidden">
+                    {resumeUrl ? (
                         <img
                             src={resumeUrl}
-                            alt="resume"
+                            alt="resume thumbnail"
                             className="w-full h-[350px] max-sm:h-[200px] object-cover object-top"
                         />
-                    </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center p-6 text-gray-400 gap-2">
+                            <span className="text-xs">Preview Loading...</span>
+                        </div>
+                    )}
                 </div>
-                )}
+            </div>
         </Link>
     )
 }
-export default ResumeCard
+export default ResumeCard;

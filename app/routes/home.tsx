@@ -26,17 +26,33 @@ export default function Home() {
     const loadResumes = async () => {
       setLoadingResumes(true);
 
-      const resumes = (await kv.list('resume:*', true)) as KVItem[];
+      try {
+        const rawItems = (await kv.list('resume:*', true)) as KVItem[];
+        const parsedResumes: Resume[] = [];
 
-      const parsedResumes = resumes?.map((resume) => (
-          JSON.parse(resume.value) as Resume
-      ))
+        if (Array.isArray(rawItems)) {
+          for (const item of rawItems) {
+            if (!item?.value) continue;
+            try {
+              const data = typeof item.value === 'string' ? JSON.parse(item.value) : item.value;
+              if (data && data.id && data.feedback && typeof data.feedback === 'object') {
+                parsedResumes.push(data as Resume);
+              }
+            } catch (e) {
+              console.error("Failed parsing resume KV item:", item.key, e);
+            }
+          }
+        }
 
-      setResumes(parsedResumes || []);
-      setLoadingResumes(false);
-    }
+        setResumes(parsedResumes);
+      } catch (err) {
+        console.error("Failed to load resumes from KV:", err);
+      } finally {
+        setLoadingResumes(false);
+      }
+    };
 
-    loadResumes()
+    loadResumes();
   }, []);
 
   return <main className="bg-[url('/images/bg-main.svg')] bg-cover">

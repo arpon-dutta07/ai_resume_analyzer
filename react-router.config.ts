@@ -1,7 +1,8 @@
 import type { Config } from "@react-router/dev/config";
 
 export default {
-  // Config options...
-  // Server-side render by default, to enable SPA mode set this to `false`
-  ssr: true,
+  // Puter.js is a browser-only SDK loaded via <script> tag,
+  // so SSR is not compatible — use SPA mode instead.
+  ssr: false,
 } satisfies Config;
+
