@@ -7,6 +7,7 @@ interface ThemeContextType {
     resolvedTheme: "light" | "dark";
     setTheme: (theme: Theme) => void;
     toggleTheme: () => void;
+    isTransitioning: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -14,6 +15,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     const [theme, setThemeState] = useState<Theme>("system");
     const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
+    const [isTransitioning, setIsTransitioning] = useState(false);
 
     useEffect(() => {
         const savedTheme = (localStorage.getItem("resumind-theme") as Theme) || "system";
@@ -34,18 +36,32 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [theme]);
 
+    const triggerThemeTransition = () => {
+        const root = document.documentElement;
+        root.classList.add("theme-transitioning");
+        setIsTransitioning(true);
+
+        setTimeout(() => {
+            root.classList.remove("theme-transitioning");
+            setIsTransitioning(false);
+        }, 700);
+    };
+
     const setTheme = (newTheme: Theme) => {
+        triggerThemeTransition();
         setThemeState(newTheme);
         localStorage.setItem("resumind-theme", newTheme);
     };
 
     const toggleTheme = () => {
+        triggerThemeTransition();
         const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
-        setTheme(nextTheme);
+        setThemeState(nextTheme);
+        localStorage.setItem("resumind-theme", nextTheme);
     };
 
     return (
-        <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, toggleTheme }}>
+        <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, toggleTheme, isTransitioning }}>
             {children}
         </ThemeContext.Provider>
     );

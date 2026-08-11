@@ -11,6 +11,8 @@ interface ResumeCardProps {
 const ResumeCard = ({ resume: { id, companyName, jobTitle, feedback, imagePath, resumePath }, onDelete }: ResumeCardProps) => {
     const { fs, kv } = usePuterStore();
     const [resumeUrl, setResumeUrl] = useState('');
+    const [imageError, setImageError] = useState(false);
+    const [isLoadingImage, setIsLoadingImage] = useState(true);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -18,27 +20,39 @@ const ResumeCard = ({ resume: { id, companyName, jobTitle, feedback, imagePath, 
         let isMounted = true;
         let objectUrl = '';
 
-        const loadResume = async () => {
-            if (!imagePath) return;
-
-            // Direct URL / local static asset path
-            if (imagePath.startsWith('/images/') || imagePath.startsWith('http://') || imagePath.startsWith('https://') || imagePath.startsWith('data:')) {
-                if (isMounted) setResumeUrl(imagePath);
+        const loadResume = async (retries = 3) => {
+            if (!imagePath) {
+                if (isMounted) setIsLoadingImage(false);
                 return;
             }
 
-            // Puter FS path
+            // Direct URL / local static asset path
+            if (imagePath.startsWith('/images/') || imagePath.startsWith('http://') || imagePath.startsWith('https://') || imagePath.startsWith('data:')) {
+                if (isMounted) {
+                    setResumeUrl(imagePath);
+                    setIsLoadingImage(false);
+                }
+                return;
+            }
+
+            // Puter FS path (e.g. /AppData/...)
             try {
                 const blob = await fs.read(imagePath);
                 if (blob && isMounted) {
                     objectUrl = URL.createObjectURL(blob);
                     setResumeUrl(objectUrl);
-                } else if (isMounted) {
-                    setResumeUrl(imagePath);
+                    setIsLoadingImage(false);
+                    return;
                 }
             } catch (err) {
-                console.error("Failed to load resume thumbnail:", err);
-                if (isMounted) setResumeUrl(imagePath);
+                console.warn(`Attempt failed loading ${imagePath} from Puter FS:`, err);
+            }
+
+            if (retries > 0 && isMounted) {
+                setTimeout(() => loadResume(retries - 1), 600);
+            } else if (isMounted) {
+                setImageError(true);
+                setIsLoadingImage(false);
             }
         };
 
@@ -59,7 +73,7 @@ const ResumeCard = ({ resume: { id, companyName, jobTitle, feedback, imagePath, 
             // Delete KV entry
             await kv.delete(`resume:${id}`);
 
-            // Optionally delete files from Puter FS
+            // Delete files from Puter FS if applicable
             if (imagePath && !imagePath.startsWith('/images/')) {
                 await fs.delete(imagePath).catch(() => {});
             }
@@ -86,10 +100,12 @@ const ResumeCard = ({ resume: { id, companyName, jobTitle, feedback, imagePath, 
     };
 
     const badge = getScoreBadge(overallScore);
+    const companyInitial = (companyName || jobTitle || "R").charAt(0).toUpperCase();
 
     return (
         <div className="relative group">
-            <Link to={`/resume/${id}`} className="resume-card animate-in fade-in duration-700">
+            <Link to={`/resume/${id}`} className="resume-card animate-in fade-in duration-700 flex flex-col justify-between">
+                {/* Card Header */}
                 <div className="resume-card-header">
                     <div className="flex flex-col gap-1.5 min-w-0 flex-1 pr-2">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -121,25 +137,59 @@ const ResumeCard = ({ resume: { id, companyName, jobTitle, feedback, imagePath, 
                     </div>
                 </div>
 
-                <div className="gradient-border flex-1 flex flex-col overflow-hidden">
+                {/* Card Body Preview Frame */}
+                <div className="gradient-border flex-1 flex flex-col overflow-hidden mt-2">
                     <div className="w-full h-full min-h-[260px] flex items-center justify-center bg-slate-50 dark:bg-slate-950/60 rounded-2xl overflow-hidden relative group/img">
-                        {resumeUrl ? (
+                        {isLoadingImage ? (
+                            <div className="flex flex-col items-center justify-center p-6 text-slate-400 gap-2">
+                                <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                                <span className="text-xs font-medium">Loading thumbnail...</span>
+                            </div>
+                        ) : resumeUrl && !imageError ? (
                             <>
                                 <img
                                     src={resumeUrl}
-                                    alt="resume thumbnail"
+                                    alt="resume preview"
+                                    onError={() => setImageError(true)}
                                     className="w-full h-[320px] max-sm:h-[220px] object-cover object-top group-hover/img:scale-105 transition-transform duration-500"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                                    <span className="text-xs font-semibold text-white bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-full">
-                                        Click to view full review &rarr;
+                                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                    <span className="text-xs font-semibold text-white bg-slate-900/90 backdrop-blur-md px-3.5 py-2 rounded-full flex items-center gap-1.5 shadow-lg">
+                                        <span>View Evaluation Report</span>
+                                        <span>&rarr;</span>
                                     </span>
                                 </div>
                             </>
                         ) : (
-                            <div className="flex flex-col items-center justify-center p-6 text-slate-400 gap-2">
-                                <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                                <span className="text-xs font-medium">Loading thumbnail...</span>
+                            /* Stylish Document Preview Fallback */
+                            <div className="w-full h-[320px] max-sm:h-[220px] p-6 bg-gradient-to-br from-indigo-50/50 via-slate-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-indigo-950/40 flex flex-col justify-between relative overflow-hidden group-hover/img:scale-[1.02] transition-transform duration-300">
+                                <div className="flex items-center justify-between">
+                                    <div className="w-10 h-10 rounded-2xl bg-indigo-600 text-white font-black text-lg flex items-center justify-center shadow-md">
+                                        {companyInitial}
+                                    </div>
+                                    <span className="text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                                        PDF Evaluated
+                                    </span>
+                                </div>
+
+                                <div className="flex flex-col gap-2 my-auto">
+                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300">
+                                        <svg className="w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <span className="truncate">{companyName || jobTitle || "Resume Document"}</span>
+                                    </div>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                                        Detailed ATS compliance evaluation, content tips, and structural feedback generated by AI.
+                                    </p>
+                                </div>
+
+                                <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-800">
+                                    <span className="text-[11px] font-semibold text-slate-400">Click to view report</span>
+                                    <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                                        Open Report &rarr;
+                                    </span>
+                                </div>
                             </div>
                         )}
                     </div>

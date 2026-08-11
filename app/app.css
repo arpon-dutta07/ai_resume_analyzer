@@ -19,14 +19,47 @@
   --color-badge-yellow-text: #73321b;
 }
 
+/* Full Page Theme Transition Animation */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
 html,
 body {
-  @apply bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300 antialiased selection:bg-indigo-500 selection:text-white;
+  min-height: 100vh;
   font-family: var(--font-sans);
+  background-color: #f1f5f9;
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(99, 102, 241, 0.25) 0px, transparent 50%),
+    radial-gradient(at 90% 15%, rgba(6, 182, 212, 0.25) 0px, transparent 50%),
+    radial-gradient(at 50% 90%, rgba(168, 85, 247, 0.2) 0px, transparent 50%),
+    radial-gradient(at 80% 80%, rgba(244, 63, 94, 0.15) 0px, transparent 50%);
+  background-attachment: fixed;
+  color: #0f172a;
+  transition: background-color 0.5s ease, color 0.5s ease;
+  antialiased: true;
+}
+
+html.dark body {
+  background-color: #020617;
+  background-image: 
+    radial-gradient(at 10% 10%, rgba(67, 56, 202, 0.45) 0px, transparent 50%),
+    radial-gradient(at 90% 15%, rgba(14, 116, 144, 0.45) 0px, transparent 50%),
+    radial-gradient(at 50% 90%, rgba(126, 34, 206, 0.35) 0px, transparent 50%),
+    radial-gradient(at 80% 80%, rgba(190, 18, 60, 0.25) 0px, transparent 50%);
+  background-attachment: fixed;
+  color: #f8fafc;
 }
 
 main {
-  @apply min-h-screen pt-4 pb-12;
+  @apply min-h-screen pt-4 pb-12 relative z-10;
 }
 
 h1 {
@@ -37,18 +70,18 @@ h1, .text-gradient {
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  background-image: linear-gradient(to right, #0f172a, #1e1b4b, #334155);
+  background-image: linear-gradient(to right, #0f172a, #312e81, #1e293b);
 }
 
 .dark h1, .dark .text-gradient {
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  background-image: linear-gradient(to right, #a5b4fc, #ffffff, #67e8f9);
+  background-image: linear-gradient(to right, #a5b4fc, #ffffff, #38bdf8);
 }
 
 h2 {
-  @apply text-2xl md:text-3xl text-slate-600 dark:text-slate-300 font-semibold;
+  @apply text-2xl md:text-3xl text-slate-700 dark:text-slate-200 font-semibold;
 }
 
 label {
@@ -56,44 +89,42 @@ label {
 }
 
 input, textarea {
-  @apply w-full p-4 rounded-2xl focus:outline-none bg-white/80 dark:bg-slate-900/80 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-800 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200 shadow-sm backdrop-blur-md;
+  @apply w-full p-4 rounded-2xl focus:outline-none bg-white/80 dark:bg-slate-900/80 text-slate-900 dark:text-slate-100 border border-slate-200/80 dark:border-slate-800 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20 transition-all duration-300 shadow-sm backdrop-blur-md;
 }
 
 form {
   @apply flex flex-col items-start gap-6 w-full;
 }
 
-
-
 .gradient-border {
-  @apply bg-gradient-to-b from-indigo-50/80 to-slate-100/80 dark:from-slate-900/80 dark:to-slate-950/80 border border-indigo-100 dark:border-slate-800/80 p-4 rounded-2xl shadow-sm backdrop-blur-md;
+  @apply bg-gradient-to-b from-white/90 via-indigo-50/40 to-slate-100/90 dark:from-slate-900/90 dark:via-slate-950/80 dark:to-indigo-950/40 border border-indigo-100 dark:border-slate-800/80 p-4 rounded-2xl shadow-sm backdrop-blur-md transition-all duration-300;
 }
 
 .primary-button {
-  @apply bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-semibold rounded-full px-6 py-3 cursor-pointer transition-all duration-300 shadow-lg shadow-indigo-500/25 active:scale-[0.98] flex items-center justify-center gap-2;
+  @apply bg-gradient-to-r from-indigo-600 via-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-semibold rounded-full px-6 py-3 cursor-pointer transition-all duration-300 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] flex items-center justify-center gap-2;
 }
 
 .secondary-button {
-  @apply bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold rounded-full px-5 py-2.5 cursor-pointer transition-all duration-200 border border-slate-200/80 dark:border-slate-700/80 active:scale-[0.98] flex items-center justify-center gap-2;
+  @apply bg-white/80 hover:bg-slate-100 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold rounded-full px-5 py-2.5 cursor-pointer transition-all duration-300 border border-slate-200 dark:border-slate-700 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm backdrop-blur-md;
 }
 
 .resume-nav {
-  @apply flex flex-row justify-between items-center px-6 py-4 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-950/70 backdrop-blur-md sticky top-0 z-50;
+  @apply flex flex-row justify-between items-center px-6 py-4 border-b border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-950/70 backdrop-blur-md sticky top-0 z-50 transition-colors duration-300;
 }
 
 .resume-summary {
   @apply flex flex-row items-center justify-center p-4 gap-4;
   .category {
-    @apply flex flex-row gap-2 items-center bg-slate-50 dark:bg-slate-900/90 rounded-2xl p-4 w-full justify-between border border-slate-100 dark:border-slate-800;
+    @apply flex flex-row gap-2 items-center bg-slate-50 dark:bg-slate-900/90 rounded-2xl p-4 w-full justify-between border border-slate-200/60 dark:border-slate-800;
   }
 }
 
 .back-button {
-  @apply flex flex-row items-center gap-2 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors shadow-sm;
+  @apply flex flex-row items-center gap-2 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 transition-all duration-200 shadow-sm hover:-translate-y-0.5;
 }
 
 .auth-button {
-  @apply bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 rounded-full py-4 px-8 cursor-pointer w-[600px] max-md:w-full text-2xl font-bold text-white shadow-xl shadow-indigo-500/30 transition-all duration-300 active:scale-[0.98];
+  @apply bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 rounded-full py-4 px-8 cursor-pointer w-[600px] max-md:w-full text-2xl font-bold text-white shadow-xl shadow-indigo-500/30 hover:shadow-indigo-500/40 transition-all duration-300 active:scale-[0.98];
 }
 
 .main-section {
@@ -105,11 +136,11 @@ form {
 }
 
 .resumes-section {
-  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-[1500px];
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-[1500px];
 }
 
 .resume-card {
-  @apply flex flex-col gap-6 h-[540px] w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl p-5 border border-slate-200/80 dark:border-slate-800/80 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xl hover:shadow-indigo-500/10 transition-all duration-300 relative overflow-hidden;
+  @apply flex flex-col gap-6 min-h-[520px] w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800/80 hover:border-indigo-400 dark:hover:border-indigo-500/80 shadow-lg shadow-slate-200/50 dark:shadow-slate-950/50 hover:shadow-2xl hover:shadow-indigo-500/15 hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden;
 }
 
 .resume-card-header {
@@ -121,7 +152,7 @@ form {
 }
 
 .navbar {
-  @apply flex flex-row justify-between items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-full p-3 px-8 w-full max-w-[1200px] mx-auto border border-slate-200/80 dark:border-slate-800/80 shadow-lg shadow-slate-900/5 dark:shadow-black/20;
+  @apply flex flex-row justify-between items-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-full p-3 px-8 w-full max-w-[1200px] mx-auto border border-slate-200/80 dark:border-slate-800/80 shadow-xl shadow-indigo-500/5 dark:shadow-black/40 transition-all duration-300;
 }
 
 .score-badge {
@@ -133,7 +164,7 @@ form {
 }
 
 .uploader-drag-area {
-  @apply relative p-10 text-center transition-all duration-300 cursor-pointer bg-white/60 dark:bg-slate-900/60 rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 min-h-[220px] backdrop-blur-md flex flex-col items-center justify-center gap-3;
+  @apply relative p-10 text-center transition-all duration-300 cursor-pointer bg-white/60 dark:bg-slate-900/60 rounded-3xl border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 min-h-[220px] backdrop-blur-md flex flex-col items-center justify-center gap-3 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30;
 }
 
 .uploader-selected-file {
@@ -141,5 +172,9 @@ form {
 }
 
 .glass-card {
-  @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-white/20 dark:border-slate-800/80 shadow-xl rounded-3xl;
+  @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-xl rounded-3xl transition-all duration-300;
+}
+
+@utility inset-shadow {
+  box-shadow: inset 0 0 12px 0 rgba(99, 102, 241, 0.15);
 }
